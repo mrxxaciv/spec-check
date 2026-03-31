@@ -1,602 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SpecCheck – Can Your PC Run It?</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Specs Checker | Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f111a;
+            --card: #161925;
+            --accent: #00f2ff;
+            --accent2: #7000ff;
+            --text: #e0e0e0;
+            --muted: #8b949e;
+            --border: #30363d;
+            --green: #23d18b;
+            --yellow: #f5a623;
+            --red: #ff453a;
+        }
 
-<style>
-:root {
-  --bg:        #080b10;
-  --bg2:       #0d1117;
-  --bg3:       #111827;
-  --border:    #1e2d3d;
-  --accent:    #00d4ff;
-  --accent2:   #7c3aed;
-  --green:     #00ff88;
-  --yellow:    #fbbf24;
-  --red:       #ff3b5c;
-  --text:      #e2e8f0;
-  --muted:     #64748b;
-  --card:      #0f1923;
-}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 50px; }
+        header h1 { 
+            font-size: 3rem; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+        .spec-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
-/* ── BACKGROUND GRID ──────────────────────────── */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background-image:
-    linear-gradient(rgba(0,212,255,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events:none; z-index:0;
-}
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; color: var(--accent); text-transform: uppercase; font-size: 0.85rem; }
+        
+        select, input {
+            background: #090b11;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus, input:focus { border-color: var(--accent); }
 
-/* ── HEADER ──────────────────────────────────── */
-header {
-  position: relative; z-index:1;
-  text-align: center;
-  padding: 60px 20px 40px;
-}
+        button.main-btn {
+            grid-column: 1 / -1;
+            background: linear-gradient(45deg, var(--accent2), var(--accent));
+            border: none;
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 6px;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
 
-.logo {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height:1;
-}
+        .summary-bar {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .stat-val { font-size: 2rem; font-weight: 700; display: block; }
 
-.tagline {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: .85rem;
-  color: var(--muted);
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  margin-top: 8px;
-}
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .filter-btn.active { background: var(--accent2); color: white; border-color: var(--accent2); }
 
-.accent-line {
-  width:120px; height:2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  margin: 20px auto 0;
-}
+        .search-box { flex: 1; min-width: 200px; }
 
-/* ── MAIN LAYOUT ─────────────────────────────── */
-main {
-  position: relative; z-index:1;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px 80px;
-}
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; }
+        th { background: #1c212e; color: var(--accent); text-align: left; padding: 15px; text-transform: uppercase; font-size: 0.8rem; }
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        .recommended { background: rgba(35, 209, 139, 0.2); color: var(--green); }
+        .minimum { background: rgba(245, 166, 35, 0.2); color: var(--yellow); }
+        .incompatible { background: rgba(255, 69, 58, 0.2); color: var(--red); }
 
-/* ── SPEC PANEL ──────────────────────────────── */
-.spec-panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
-  border-radius: 4px 4px 8px 8px;
-  padding: 36px 40px;
-  margin-bottom: 40px;
-  position: relative;
-  overflow: hidden;
-}
+        .genre-tag { color: var(--muted); font-size: 0.8rem; }
+        .check-cell { text-align: center; }
 
-.spec-panel::before {
-  content:'';
-  position:absolute; top:0; right:0;
-  width:300px; height:300px;
-  background: radial-gradient(circle, rgba(0,212,255,.05) 0%, transparent 70%);
-  pointer-events:none;
-}
-
-.panel-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing:.15em;
-  text-transform:uppercase;
-  color: var(--accent);
-  margin-bottom: 28px;
-  display:flex; align-items:center; gap:10px;
-}
-
-.panel-title::before {
-  content:'';
-  width:4px; height:18px;
-  background: var(--accent);
-  display:block;
-}
-
-.spec-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 32px;
-}
-
-@media(max-width:640px){ .spec-grid{ grid-template-columns:1fr; } }
-
-.field-group { display:flex; flex-direction:column; gap:8px; }
-
-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: .75rem;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color: var(--muted);
-}
-
-select, input[type=number] {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 12px 14px;
-  border-radius: 4px;
-  font-family: 'Inter', sans-serif;
-  font-size: .9rem;
-  outline: none;
-  transition: border-color .2s;
-  appearance: none;
-  width:100%;
-}
-
-select:focus, input[type=number]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(0,212,255,.12);
-}
-
-.btn-check {
-  margin-top: 28px;
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: .15em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: opacity .2s, transform .1s;
-  position:relative; overflow:hidden;
-}
-
-.btn-check:hover  { opacity:.9; }
-.btn-check:active { transform: scale(.99); }
-.btn-check:disabled { opacity:.4; cursor:not-allowed; }
-
-.btn-check .spinner {
-  display:none;
-  width:18px; height:18px;
-  border:2px solid rgba(255,255,255,.3);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation: spin .7s linear infinite;
-  margin: 0 auto;
-}
-.btn-check.loading .btn-label { display:none; }
-.btn-check.loading .spinner   { display:block; }
-
-@keyframes spin { to { transform:rotate(360deg); } }
-
-/* ── SUMMARY BAR ──────────────────────────────── */
-#summary {
-  display:none;
-  grid-template-columns: repeat(3, 1fr);
-  gap:16px;
-  margin-bottom:32px;
-  animation: fadeUp .4s ease;
-}
-
-.sum-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius:6px;
-  padding:20px;
-  text-align:center;
-}
-
-.sum-num {
-  font-family:'Rajdhani', sans-serif;
-  font-size: 2.4rem;
-  font-weight:700;
-  line-height:1;
-}
-
-.sum-label {
-  font-family:'Share Tech Mono', monospace;
-  font-size: .7rem;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  margin-top:4px;
-}
-
-.sum-card.green .sum-num  { color: var(--green); }
-.sum-card.yellow .sum-num { color: var(--yellow); }
-.sum-card.red .sum-num    { color: var(--red); }
-
-/* ── FILTER ROW ──────────────────────────────── */
-#filter-row {
-  display:none;
-  gap:12px;
-  margin-bottom:24px;
-  flex-wrap:wrap;
-  animation: fadeUp .4s ease .1s both;
-}
-
-.search-box {
-  flex:1; min-width:200px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 4px;
-  font-size:.9rem;
-  outline:none;
-}
-.search-box:focus { border-color:var(--accent); }
-
-.filter-btn {
-  padding:10px 18px;
-  border-radius:4px;
-  border:1px solid var(--border);
-  background: var(--bg3);
-  color: var(--muted);
-  font-family:'Rajdhani', sans-serif;
-  font-size:.85rem;
-  font-weight:600;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  cursor:pointer;
-  transition:all .15s;
-}
-.filter-btn:hover              { border-color:var(--muted); color:var(--text); }
-.filter-btn.active             { border-color:var(--accent); color:var(--accent); background:rgba(0,212,255,.07); }
-.filter-btn[data-f="minimum"].active  { border-color:var(--yellow); color:var(--yellow); background:rgba(251,191,36,.07); }
-.filter-btn[data-f="incompatible"].active { border-color:var(--red); color:var(--red); background:rgba(255,59,92,.07); }
-
-/* ── RESULTS TABLE ──────────────────────────── */
-#results-wrap {
-  display:none;
-  animation: fadeUp .4s ease .2s both;
-}
-
-.results-table {
-  width:100%;
-  border-collapse:collapse;
-  font-size:.88rem;
-}
-
-.results-table thead th {
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-  padding:12px 16px;
-  text-align:left;
-  font-family:'Share Tech Mono', monospace;
-  font-size:.72rem;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color: var(--muted);
-  white-space:nowrap;
-}
-
-.results-table tbody tr {
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  transition: background .15s;
-}
-.results-table tbody tr:hover { background:rgba(255,255,255,.03); }
-
-.results-table td {
-  padding:12px 16px;
-  vertical-align:middle;
-}
-
-.game-title {
-  font-weight:500;
-  white-space:nowrap;
-}
-
-.genre-tag {
-  display:inline-block;
-  padding:2px 8px;
-  border-radius:3px;
-  background:rgba(255,255,255,.06);
-  font-size:.74rem;
-  color:var(--muted);
-  white-space:nowrap;
-}
-
-.status-badge {
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:4px 12px;
-  border-radius:3px;
-  font-family:'Rajdhani', sans-serif;
-  font-size:.82rem;
-  font-weight:700;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
-.status-badge.recommended  { background:rgba(0,255,136,.12); color:var(--green); border:1px solid rgba(0,255,136,.25); }
-.status-badge.minimum      { background:rgba(251,191,36,.10); color:var(--yellow); border:1px solid rgba(251,191,36,.25); }
-.status-badge.incompatible { background:rgba(255,59,92,.10); color:var(--red); border:1px solid rgba(255,59,92,.25); }
-
-.check-cell { text-align:center; font-size:.95rem; }
-
-#error-msg {
-  display:none;
-  background:rgba(255,59,92,.1);
-  border:1px solid rgba(255,59,92,.3);
-  color:var(--red);
-  padding:14px 18px;
-  border-radius:6px;
-  font-size:.9rem;
-  margin-bottom:24px;
-}
-
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-/* ── FOOTER ──────────────────────────────────── */
-footer {
-  position:relative; z-index:1;
-  text-align:center;
-  padding:30px 20px;
-  color:var(--muted);
-  font-size:.78rem;
-  font-family:'Share Tech Mono', monospace;
-  letter-spacing:.1em;
-  border-top:1px solid var(--border);
-}
-</style>
+        /* Loading Spinner */
+        #loader { display: none; text-align: center; padding: 40px; color: var(--accent); font-weight: 600; }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">SpecCheck</div>
-  <div class="tagline">// Can your PC run it?</div>
-  <div class="accent-line"></div>
-</header>
+<div class="container">
+    <header>
+        <h1>SpecCheck Pro</h1>
+        <p style="color: var(--muted)">Enter your rig to see what you can play</p>
+    </header>
 
-<main>
-
-  <!-- ── SPEC INPUT PANEL ───────────────────────── -->
-  <div class="spec-panel">
-    <div class="panel-title">Enter Your PC Specs</div>
-
-    <div class="spec-grid">
-      <div class="field-group">
-        <label>GPU</label>
-        <select id="gpu-select"><option value="">Loading GPUs…</option></select>
-      </div>
-      <div class="field-group">
-        <label>CPU</label>
-        <select id="cpu-select"><option value="">Loading CPUs…</option></select>
-      </div>
-      <div class="field-group">
-        <label>RAM (GB)</label>
-        <input type="number" id="ram-input" min="1" max="256" value="16" placeholder="16"/>
-      </div>
-      <div class="field-group">
-        <label>Storage Free (GB)</label>
-        <input type="number" id="storage-input" min="1" max="4000" value="500" placeholder="500"/>
-      </div>
+    <div class="spec-panel">
+        <div class="input-group">
+            <label>Graphics Card</label>
+            <select id="gpu-select"><option>Loading...</option></select>
+        </div>
+        <div class="input-group">
+            <label>Processor</label>
+            <select id="cpu-select"><option>Loading...</option></select>
+        </div>
+        <div class="input-group">
+            <label>RAM (GB)</label>
+            <input type="number" id="ram-input" value="16">
+        </div>
+        <div class="input-group">
+            <label>Free Space (GB)</label>
+            <input type="number" id="storage-input" value="500">
+        </div>
+        <button class="main-btn" onclick="checkSpecs()">Run Compatibility Check</button>
     </div>
 
-    <button class="btn-check" id="check-btn" onclick="checkSpecs()">
-      <span class="btn-label">Check Compatibility</span>
-      <span class="spinner"></span>
-    </button>
-  </div>
+    <div id="loader">ANALYZING SYSTEM REQUIREMENTS...</div>
 
-  <!-- ── ERROR ──────────────────────────────────── -->
-  <div id="error-msg"></div>
-
-  <!-- ── SUMMARY ────────────────────────────────── -->
-  <div id="summary" style="display:none; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:32px;">
-    <div class="sum-card green">
-      <div class="sum-num" id="sum-rec">0</div>
-      <div class="sum-label" style="color:var(--green);">Recommended</div>
+    <div id="summary" class="summary-bar">
+        <div class="stat-card"><span class="stat-val" id="count-rec" style="color: var(--green)">0</span> RECOMMENDED</div>
+        <div class="stat-card"><span class="stat-val" id="count-min" style="color: var(--yellow)">0</span> MINIMUM</div>
+        <div class="stat-card"><span class="stat-val" id="count-inc" style="color: var(--red)">0</span> CAN'T RUN</div>
     </div>
-    <div class="sum-card yellow">
-      <div class="sum-num" id="sum-min">0</div>
-      <div class="sum-label" style="color:var(--yellow);">Minimum Only</div>
-    </div>
-    <div class="sum-card red">
-      <div class="sum-num" id="sum-inc">0</div>
-      <div class="sum-label" style="color:var(--red);">Can't Run</div>
-    </div>
-  </div>
 
-  <!-- ── FILTER ROW ─────────────────────────────── -->
-  <div id="filter-row" style="display:none; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
-    <input class="search-box" id="search-box" type="text" placeholder="Search game…" oninput="applyFilter()"/>
-    <button class="filter-btn active" data-f="all"          onclick="setFilter('all',this)">All</button>
-    <button class="filter-btn"        data-f="recommended"  onclick="setFilter('recommended',this)">Recommended</button>
-    <button class="filter-btn"        data-f="minimum"      onclick="setFilter('minimum',this)">Minimum</button>
-    <button class="filter-btn"        data-f="incompatible" onclick="setFilter('incompatible',this)">Can't Run</button>
-  </div>
+    <div id="filter-row" style="display:none; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+        <input class="search-box" id="search-box" type="text" placeholder="Search game…" oninput="applyFilter()">
+        <button class="filter-btn active" data-f="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" data-f="recommended" onclick="setFilter('recommended',this)">Recommended</button>
+        <button class="filter-btn" data-f="minimum" onclick="setFilter('minimum',this)">Minimum</button>
+        <button class="filter-btn" data-f="incompatible" onclick="setFilter('incompatible',this)">Can't Run</button>
+        
+        <select id="genre-select" class="search-box" style="flex:0 0 160px;" onchange="applyFilter()">
+            <option value="">All Genres</option>
+            <option value="Action">Action</option>
+            <option value="Battle Royale">Battle Royale</option>
+            <option value="Co-op">Co-op</option>
+            <option value="Exploration">Exploration</option>
+            <option value="FPS">FPS</option>
+            <option value="Horror">Horror</option>
+            <option value="MMO">MMO</option>
+            <option value="MOBA">MOBA</option>
+            <option value="Open World">Open World</option>
+            <option value="Puzzle">Puzzle</option>
+            <option value="Racing">Racing</option>
+            <option value="RPG">RPG</option>
+            <option value="Sandbox">Sandbox</option>
+            <option value="Simulation">Simulation</option>
+            <option value="Social">Social</option>
+            <option value="Sports">Sports</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Survival">Survival</option>
+            <option value="VR">VR</option>
+        </select>
+    </div>
 
-  <!-- ── RESULTS TABLE ──────────────────────────── -->
-  <div id="results-wrap" style="display:none;">
-    <table class="results-table">
-      <thead>
-        <tr>
-          <th>Game</th>
-          <th>Genre</th>
-          <th>Status</th>
-          <th>GPU</th>
-          <th>CPU</th>
-          <th>RAM</th>
-          <th>Storage</th>
-        </tr>
-      </thead>
-      <tbody id="results-body"></tbody>
+    <table id="results-table" style="display:none">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Genre</th>
+                <th>Status</th>
+                <th>GPU</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Storage</th>
+                <th>Upgrade Advisor</th>
+            </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
     </table>
-  </div>
-
-</main>
-
-<footer>SPECCHECK &nbsp;·&nbsp; PC COMPATIBILITY CHECKER &nbsp;·&nbsp; ~100 GAMES</footer>
+</div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────
-const API = "https://spec-check-5rbu.onrender.com";
+    const API_BASE = "https://spec-check-5rbu.onrender.com";
+    let allResults = [];
+    let activeFilter = "all";
 
-let allResults = [];
-let activeFilter = "all";
+    async function loadHardware() {
+        try {
+            const [gpus, cpus] = await Promise.all([
+                fetch(`${API_BASE}/api/gpus`).then(r => r.json()),
+                fetch(`${API_BASE}/api/cpus`).then(r => r.json())
+            ]);
 
-// ── BOOT: load GPU + CPU lists ────────────────────────────────────────────
-async function loadHardware() {
-  try {
-    const [gpuRes, cpuRes] = await Promise.all([
-      fetch(`${API}/api/gpus`),
-      fetch(`${API}/api/cpus`)
-    ]);
-    const gpus = await gpuRes.json();
-    const cpus = await cpuRes.json();
+            const gpuSel = document.getElementById("gpu-select");
+            gpuSel.innerHTML = gpus.map(g => `<option value="${g.gpu_name}">${g.gpu_name} (Tier ${g.tier})</option>`).join("");
+            
+            const cpuSel = document.getElementById("cpu-select");
+            cpuSel.innerHTML = cpus.map(c => `<option value="${c.cpu_name}">${c.cpu_name} (Tier ${c.tier})</option>`).join("");
+            
+            restoreRig();
+        } catch (e) { console.error("Load failed", e); }
+    }
 
-    const gpuSel = document.getElementById("gpu-select");
-    const cpuSel = document.getElementById("cpu-select");
+    async function checkSpecs() {
+        const gpu = document.getElementById("gpu-select").value;
+        const cpu = document.getElementById("cpu-select").value;
+        const ram = document.getElementById("ram-input").value;
+        const storage = document.getElementById("storage-input").value;
 
-    gpuSel.innerHTML = '<option value="">-- Select GPU --</option>';
-    cpuSel.innerHTML = '<option value="">-- Select CPU --</option>';
+        saveRig();
+        document.getElementById("loader").style.display = "block";
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/check?gpu=${gpu}&cpu=${cpu}&ram=${ram}&storage=${storage}`);
+            const data = await res.json();
+            
+            allResults = data.results;
+            document.getElementById("count-rec").innerText = data.summary.recommended;
+            document.getElementById("count-min").innerText = data.summary.minimum;
+            document.getElementById("count-inc").innerText = data.summary.incompatible;
 
-    gpus.forEach(g => {
-      const o = document.createElement("option");
-      o.value = g.gpu_name; o.textContent = `${g.gpu_name}  (Tier ${g.tier})`;
-      gpuSel.appendChild(o);
-    });
+            document.getElementById("summary").style.display = "grid";
+            document.getElementById("filter-row").style.display = "flex";
+            document.getElementById("results-table").style.display = "table";
+            
+            applyFilter();
+        } catch (e) { alert("Check failed. Verify backend is live."); }
+        finally { document.getElementById("loader").style.display = "none"; }
+    }
 
-    cpus.forEach(c => {
-      const o = document.createElement("option");
-      o.value = c.cpu_name; o.textContent = `${c.cpu_name}  (Tier ${c.tier})`;
-      cpuSel.appendChild(o);
-    });
-  } catch(e) {
-    document.getElementById("error-msg").textContent = "⚠ Could not reach the API. Make sure the backend is running.";
-    document.getElementById("error-msg").style.display = "block";
-  }
-}
+    function renderTable(rows) {
+        const tbody = document.getElementById("results-body");
+        tbody.innerHTML = "";
 
-// ── CHECK SPECS ───────────────────────────────────────────────────────────
-async function checkSpecs() {
-  const gpu     = document.getElementById("gpu-select").value;
-  const cpu     = document.getElementById("cpu-select").value;
-  const ram     = parseInt(document.getElementById("ram-input").value);
-  const storage = parseInt(document.getElementById("storage-input").value);
-  const btn     = document.getElementById("check-btn");
-  const errDiv  = document.getElementById("error-msg");
+        if (!rows.length) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:40px;">No games match filter.</td></tr>`;
+            return;
+        }
 
-  errDiv.style.display = "none";
+        rows.forEach(r => {
+            let advisorCell = "—";
+            if (r.status === "incompatible" && r.suggestions && r.suggestions.length) {
+                const bullets = r.suggestions.map(s => `
+                    <li style="margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <span style="color:var(--muted); font-size:.78rem;">${s.message}</span>
+                        <a href="${s.link}" target="_blank" rel="noopener noreferrer" 
+                           style="display:inline-block; padding:3px 10px; background:var(--accent2); color:#fff; border-radius:3px; font-size:.72rem; text-decoration:none; font-weight:600;">
+                           🛒 Buy on Amazon
+                        </a>
+                    </li>`).join("");
 
-  if (!gpu || !cpu) { showError("Please select both a GPU and a CPU."); return; }
-  if (!ram || !storage) { showError("Please enter valid RAM and storage values."); return; }
+                advisorCell = `<details><summary style="cursor:pointer; color:var(--red); font-size:.8rem;">▲ ${r.suggestions.length} upgrade(s) needed</summary>
+                                <ul style="margin-top:10px; padding-left:12px; border-left:2px solid var(--border); list-style:none;">${bullets}</ul></details>`;
+            } else if (r.status === "recommended") {
+                advisorCell = `<span style="color:var(--green); font-size:.8rem;">✦ All good</span>`;
+            } else if (r.status === "minimum") {
+                advisorCell = `<span style="color:var(--yellow); font-size:.8rem;">▲ Upgrade for best experience</span>`;
+            }
 
-  btn.classList.add("loading"); btn.disabled = true;
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="game-title">${r.title}</td>
+                <td><span class="genre-tag">${r.genre}</span></td>
+                <td><span class="status-badge ${r.status}">${statusLabel(r.status)}</span></td>
+                <td class="check-cell">${r.gpu_ok}</td>
+                <td class="check-cell">${r.cpu_ok}</td>
+                <td class="check-cell">${r.ram_ok}</td>
+                <td class="check-cell">${r.storage_ok}</td>
+                <td style="min-width:200px;">${advisorCell}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
-  try {
-    const res = await fetch(`${API}/api/check?gpu=${encodeURIComponent(gpu)}&cpu=${encodeURIComponent(cpu)}&ram=${ram}&storage=${storage}`);
-    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || "API error"); }
-    const data = await res.json();
-    allResults = data.results;
-    renderSummary(data.summary);
-    applyFilter();
-    document.getElementById("summary").style.display = "grid";
-    document.getElementById("filter-row").style.display = "flex";
-    document.getElementById("results-wrap").style.display = "block";
-  } catch(e) {
-    showError("Error: " + e.message);
-  } finally {
-    btn.classList.remove("loading"); btn.disabled = false;
-  }
-}
+    function statusLabel(s) {
+        if (s === "recommended") return "✦ Recommended";
+        if (s === "minimum") return "▲ Minimum";
+        return "✕ Can't Run";
+    }
 
-function showError(msg) {
-  const d = document.getElementById("error-msg");
-  d.textContent = msg; d.style.display = "block";
-}
+    function setFilter(type, btn) {
+        activeFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter();
+    }
 
-// ── SUMMARY ───────────────────────────────────────────────────────────────
-function renderSummary(s) {
-  document.getElementById("sum-rec").textContent = s.recommended;
-  document.getElementById("sum-min").textContent = s.minimum;
-  document.getElementById("sum-inc").textContent = s.incompatible;
-}
+    function applyFilter() {
+        const q = (document.getElementById("search-box").value || "").toLowerCase();
+        const genre = document.getElementById("genre-select").value;
+        const filtered = allResults.filter(r => {
+            const matchStatus = activeFilter === "all" || r.status === activeFilter;
+            const matchSearch = r.title.toLowerCase().includes(q);
+            const matchGenre = !genre || r.genre === genre;
+            return matchStatus && matchSearch && matchGenre;
+        });
+        renderTable(filtered);
+    }
 
-// ── FILTER ────────────────────────────────────────────────────────────────
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  applyFilter();
-}
+    function saveRig() {
+        localStorage.setItem("rig_gpu", document.getElementById("gpu-select").value);
+        localStorage.setItem("rig_cpu", document.getElementById("cpu-select").value);
+        localStorage.setItem("rig_ram", document.getElementById("ram-input").value);
+        localStorage.setItem("rig_storage", document.getElementById("storage-input").value);
+    }
 
-function applyFilter() {
-  const q = (document.getElementById("search-box").value || "").toLowerCase();
-  const filtered = allResults.filter(r => {
-    const matchFilter = activeFilter === "all" || r.status === activeFilter;
-    const matchSearch = r.title.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
-  });
-  renderTable(filtered);
-}
+    function restoreRig() {
+        const gpu = localStorage.getItem("rig_gpu");
+        const cpu = localStorage.getItem("rig_cpu");
+        const ram = localStorage.getItem("rig_ram");
+        const storage = localStorage.getItem("rig_storage");
+        if(gpu) document.getElementById("gpu-select").value = gpu;
+        if(cpu) document.getElementById("cpu-select").value = cpu;
+        if(ram) document.getElementById("ram-input").value = ram;
+        if(storage) document.getElementById("storage-input").value = storage;
+    }
 
-// ── TABLE ─────────────────────────────────────────────────────────────────
-function renderTable(rows) {
-  const tbody = document.getElementById("results-body");
-  tbody.innerHTML = "";
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:40px;">No games match the current filter.</td></tr>`;
-    return;
-  }
-
-  rows.forEach(r => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="game-title">${r.title}</td>
-      <td><span class="genre-tag">${r.genre}</span></td>
-      <td><span class="status-badge ${r.status}">${statusLabel(r.status)}</span></td>
-      <td class="check-cell">${r.gpu_ok}</td>
-      <td class="check-cell">${r.cpu_ok}</td>
-      <td class="check-cell">${r.ram_ok}</td>
-      <td class="check-cell">${r.storage_ok}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function statusLabel(s) {
-  if (s === "recommended")  return "✦ Recommended";
-  if (s === "minimum")      return "▲ Minimum";
-  return "✕ Can't Run";
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-loadHardware();
+    loadHardware();
 </script>
 </body>
 </html>
